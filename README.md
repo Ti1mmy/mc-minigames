@@ -1,28 +1,32 @@
-# Minecraft Bingo on Railway
+# Minecraft minigames on Railway
 
-Paper 1.21.5 with [Minecraft Bingo 1.12.1](https://github.com/Extremelyd1/minecraft-bingo/releases/tag/v1.12.1), using the itzg Minecraft server image and Java 21.
+The active game is **MissileWarsX**, running on **Minecraft Java 26.2**, Paper build 133 and Java 25. No client mods are required. Bingo is preserved and disabled while Missile Wars is active.
 
-## Railway setup
+## Join and play
 
-Deploy this repository. Mount a persistent volume at `/data`. Set `OPS` to your Minecraft Java username. Set `EULA=TRUE` only after accepting the [Minecraft EULA](https://www.minecraft.net/eula). Add a TCP proxy for internal port `25565`.
+Server: `mainline.proxy.rlwy.net:49105`
 
-The container uses a 2 GB Java heap, 12 player slots, view distance 6, and simulation distance 4. Microsoft account authentication is enabled. Remote console (RCON) is disabled. Keep one replica; the volume stores worlds and plugin settings.
+Players join the Missile Wars lobby automatically. Step onto the team pads to join a team. With players on both teams, run `/mwx start`. Useful commands: `/mwx lobby`, `/mwx spectate`, and `/mwx help`. Operator `Ti1mmy` can run `/mwx info`, `/mwx end`, and `/mwx team <player> <red|green>`.
 
-## Play
+The default classic arena, five missile types, fireballs, arrows and shields are included. View distance is 12 chunks, simulation distance is 12, and the maximum player count is 12. Microsoft account authentication stays enabled; RCON stays disabled.
 
-Use Minecraft **Java Edition 1.21.5**. In Multiplayer, add the address shown in Railway Settings → Networking → TCP Proxy, including its port. No client mods are required.
+## Deployment
 
-As the operator, after everyone joins:
+Deploy the Dockerfile from this repository. Keep one replica and a persistent volume mounted at `/data`. Railway variables include `OPS=Ti1mmy`, `VIEW_DISTANCE=12`, and `EULA=TRUE` (the owner accepted the Minecraft EULA). The TCP proxy forwards to internal port 25565.
 
-```text
-/team random 2
-/wincondition lines 1
-/timer 30m
-/start
-```
+Paper, MissileWarsX, FAWE and ProtocolLib downloads are checked against SHA-256 hashes. ProtocolLib uses the upstream development build with 26.2 support; if upstream replaces its download, update the URL/hash together after testing compatibility.
 
-Right-click the Bingo card to inspect targets. `/bingo` shows progress, `/end` ends the game, and `/reroll` creates a new card. The plugin creates its configuration in `/data/plugins/MinecraftBingo` on first start.
+On first Missile Wars startup, the wrapper archives the existing data to `/data/backups/bingo-before-missilewars.tar.gz`, then moves the Bingo jar to `/data/backups/disabled-plugins`. Bingo world folders and `/data/plugins/MinecraftBingo` remain preserved. The active Minecraft level is `missilewars_lobby` and the plugin arena is `missilewars_game`.
 
-## Administration
+## Return to Bingo
 
-Use Railway deployment logs to verify Paper reaches `Done` and MinecraftBingo enables without errors. Restart/redeploy through Railway. World and plugin data survive redeploys via the volume. Railway hosting incurs usage charges under your workspace plan.
+Stop the Missile Wars server before restoring data. Preserve any Missile Wars progress separately. Restore the original server properties and Paper/Bukkit/Spigot configurations from the backup; move the Bingo jar back from `backups/disabled-plugins` to `plugins`, and move MissileWarsX/FAWE/ProtocolLib jars outside `plugins`. Restore the original Bingo Dockerfile from commit `ac3f0efb0d1249e47448dc839041a127ef0fd8e9` and redeploy (Paper 1.21.5, Java 21). Keep `VIEW_DISTANCE=12` in Railway. Do not open worlds upgraded to 26.2 with 1.21.5; use the preserved Bingo worlds.
+
+Bingo commands after switching back: `/team random 2`, `/wincondition lines 1`, `/timer 30m`, `/start`.
+
+## Upstream projects
+
+- [MissileWarsX](https://github.com/encodeous/MissileWarsX)
+- [FastAsyncWorldEdit](https://github.com/IntellectualSites/FastAsyncWorldEdit)
+- [ProtocolLib](https://github.com/dmulloy2/ProtocolLib)
+- [Minecraft Bingo](https://github.com/Extremelyd1/minecraft-bingo)
