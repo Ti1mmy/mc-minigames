@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1.7
 FROM itzg/minecraft-server:java25
 
 ENV TYPE=CUSTOM \
