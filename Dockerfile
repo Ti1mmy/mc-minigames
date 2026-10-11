@@ -26,6 +26,8 @@ ADD --checksum=sha256:dbfa2f88ae9439b995c64229e922c77c65c3a102a7f5964c971c9584c2
 ADD --checksum=sha256:a1706c41412a108e3d2fdbd9e9dd0c60904f2ba45414c6edf11c1262812e1838 https://github.com/IntellectualSites/FastAsyncWorldEdit/releases/download/2.16.1/FastAsyncWorldEdit-Paper-2.16.1.jar /plugins/FastAsyncWorldEdit.jar
 ADD --checksum=sha256:ca3ec620315ff92bee2d6d09af297d77362e99b4791b163135b745262df75ecc https://github.com/dmulloy2/ProtocolLib/releases/download/dev-build/ProtocolLib.jar /plugins/ProtocolLib.jar
 
+RUN chmod 644 /opt/paper.jar /plugins/*.jar
+
 COPY --chmod=755 <<'SCRIPT' /start-minigames
 #!/bin/bash
 set -euo pipefail
@@ -79,6 +81,7 @@ spawn-limits:
 CONFIG
   touch backups/.missilewars-configured
 fi
+chown -R "${UID:-1000}:${GID:-1000}" /data/config /data/backups /data/spigot.yml /data/bukkit.yml
 exec /start "$@"
 SCRIPT
 
